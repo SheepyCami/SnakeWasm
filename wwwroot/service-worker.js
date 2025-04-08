@@ -8,5 +8,16 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
-    e.respondWith(fetch(e.request));
+    // Don't handle non-GET requests
+    if (e.request.method !== 'GET') {
+        return;
+    }
+
+    e.respondWith(
+        fetch(e.request)
+            .catch(function() {
+                // If the network request fails, return the offline page
+                return new Response('Offline mode is not supported yet.');
+            })
+    );
 });
