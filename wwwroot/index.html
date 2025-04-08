@@ -31,20 +31,20 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
-        // Wait for the Blazor script to load
-        window.addEventListener('load', function () {
-            // Only register service worker after Blazor is ready
-            Blazor.start().then(function () {
+        window.addEventListener('load', async function () {
+            try {
+                await Blazor.start();
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(function (registration) {
-                            console.log('Service Worker registered with scope:', registration.scope);
-                        })
-                        .catch(function (error) {
-                            console.error('Service Worker registration failed:', error);
-                        });
+                    try {
+                        const registration = await navigator.serviceWorker.register('/service-worker.js');
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    } catch (error) {
+                        console.error('Service Worker registration failed:', error);
+                    }
                 }
-            });
+            } catch (error) {
+                console.error('Blazor start failed:', error);
+            }
         });
     </script>
 </body>

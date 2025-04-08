@@ -1,45 +1,35 @@
 {
   "version": 2,
+  "public": true,
+  "cleanUrls": true,
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/_framework/(.*)",
+      "src": "/_framework/wasm/.*",
       "headers": {
-        "Content-Type": "application/octet-stream",
-        "Cache-Control": "public, max-age=31536000"
-      },
-      "continue": true
+        "content-type": "application/wasm"
+      }
     },
     {
-      "src": "/(.*)\\.js",
+      "src": "/_framework/.*\\.js",
       "headers": {
-        "Content-Type": "application/javascript",
-        "Cache-Control": "public, max-age=0"
-      },
-      "continue": true
+        "content-type": "application/javascript"
+      }
     },
     {
-      "src": "/(.*)\\.css",
+      "src": "/_framework/.*",
       "headers": {
-        "Content-Type": "text/css",
-        "Cache-Control": "public, max-age=31536000"
-      },
-      "continue": true
+        "content-type": "application/octet-stream"
+      }
     },
     {
-      "src": "/manifest.webmanifest",
+      "src": "/.*",
       "headers": {
-        "Content-Type": "application/manifest+json",
-        "Cache-Control": "public, max-age=0"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+        "Cache-Control": "no-cache"
+      }
     }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "outputDirectory": "wwwroot"
 } 
