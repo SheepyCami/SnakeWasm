@@ -1,81 +1,54 @@
 {
   "version": 2,
   "public": true,
-  "cleanUrls": true,
-  "routes": [
+  "headers": [
     {
-      "handle": "filesystem"
+      "source": "/_framework/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/octet-stream"
+        }
+      ]
     },
     {
-      "src": "/_framework/blazor.webassembly.js",
-      "headers": {
-        "content-type": "application/javascript",
-        "cache-control": "no-cache"
-      }
+      "source": "/_framework/(.*).js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
     },
     {
-      "src": "/_framework/dotnet.([^.]+).js",
-      "headers": {
-        "content-type": "application/javascript",
-        "cache-control": "no-cache"
-      }
+      "source": "/_framework/(.*).wasm",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        }
+      ]
     },
     {
-      "src": "/_framework/wasm/dotnet.wasm",
-      "headers": {
-        "content-type": "application/wasm",
-        "cache-control": "no-cache"
-      }
+      "source": "/_framework/(.*).json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     },
     {
-      "src": "/_framework/.*\\.dll",
-      "headers": {
-        "content-type": "application/octet-stream",
-        "cache-control": "no-cache"
-      }
-    },
-    {
-      "src": "/_framework/blazor.boot.json",
-      "headers": {
-        "content-type": "application/json",
-        "cache-control": "no-cache"
-      }
-    },
-    {
-      "src": "/service-worker.js",
-      "headers": {
-        "content-type": "application/javascript",
-        "cache-control": "no-cache"
-      }
-    },
-    {
-      "src": "/manifest.webmanifest",
-      "headers": {
-        "content-type": "application/manifest+json",
-        "cache-control": "no-cache"
-      }
-    },
-    {
-      "src": "/_framework/.*\\.js",
-      "headers": {
-        "content-type": "application/javascript"
-      }
-    },
-    {
-      "src": "/_framework/.*",
-      "headers": {
-        "content-type": "application/octet-stream"
-      }
-    },
-    {
-      "src": "/.*",
-      "headers": {
-        "Cache-Control": "no-cache"
-      }
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
     }
   ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "outputDirectory": "wwwroot"
+  ]
 } 
