@@ -1,11 +1,11 @@
 {
-  "name": "SnakeWasm",
-  "short_name": "SnakeWasm",
+  "name": "Slangespillet",
+  "short_name": "Slangespillet",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "background_color": "#000000",
+  "theme_color": "#00ff00",
   "prefer_related_applications": false,
   "icons": [
     {

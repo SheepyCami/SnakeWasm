@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SnakeWasm.Game.Services; // Add this using directive
+using System.Timers;
+using Slangespillet.Game.Services; // Add this using directive
 
 namespace Snake.Game
 {

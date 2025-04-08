@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 
-namespace SnakeWasm.Game.Services
+namespace Slangespillet.Game.Services
 {
     public class LeaderboardService
     {

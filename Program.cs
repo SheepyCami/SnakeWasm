@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using SnakeWasm;
-using SnakeWasm.Game.Services;
+using Slangespillet;
+using Slangespillet.Game.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

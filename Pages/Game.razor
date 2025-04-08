@@ -2,7 +2,9 @@
 @implements IDisposable
 @using Snake.Game
 @using Microsoft.AspNetCore.Components.Web
-@using SnakeWasm.Game.Services
+@using Microsoft.JSInterop
+@using Slangespillet.Game.Services
+@using Slangespillet.Components
 @inject LeaderboardService Leaderboard
 
 <div class="game-wrapper">
@@ -79,6 +81,10 @@
                     }
                 </div>
             }
+        </div>
+
+        <div class="mobile-controls-wrapper">
+            <MobileControls OnDirectionChange="HandleMobileDirection" />
         </div>
 
         <div class="leaderboard-sidebar">
@@ -346,11 +352,25 @@
         }
     }
 
-    private void HandleTouchEnd(TouchEventArgs e)
+    private void HandleTouchEnd()
     {
-        // Reset touch positions
         touchStartX = 0;
         touchStartY = 0;
+    }
+
+    private void HandleMobileDirection(Direction direction)
+    {
+        if (gameState == null || gameState.GameOver || countdown > 0 || showGo) return;
+
+        if (waitingForKey)
+        {
+            waitingForKey = false;
+            countdown = 3;
+            _ = StartCountdown(gameLoopCts!.Token);
+            return;
+        }
+
+        gameState.ChangeDirection(direction);
     }
 
     private string GetTileImage(int row, int col)

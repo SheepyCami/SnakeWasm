@@ -50,6 +50,7 @@ artifacts/
 # ASP.NET secrets
 secrets.json
 appsettings.Development.json
+appsettings.json
 *.Development.json
 
 # Blazor

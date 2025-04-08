@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "Snake game built with Blazor WebAssembly",
   "scripts": {
-    "build": "echo 'No build step needed for static files'"
+    "build": "dotnet publish -c Release && cp -r bin/Release/net8.0/publish/wwwroot/* wwwroot/",
+    "postinstall": "dotnet tool restore"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0"
+  },
+  "devDependencies": {
+    "dotnet-sdk": "^8.0.0"
   }
 } 
