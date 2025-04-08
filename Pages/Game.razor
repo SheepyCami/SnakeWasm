@@ -6,6 +6,7 @@
 @using Slangespillet.Game.Services
 @using Slangespillet.Components
 @inject LeaderboardService Leaderboard
+@inject IJSRuntime JSRuntime
 
 <div class="game-wrapper">
     <div class="game-title">
@@ -20,7 +21,7 @@
              @ontouchmove="HandleTouchMove"
              @ontouchend="HandleTouchEnd"
              @ref="gameBoard">
-            <div class="score">Poeng: @gameState?.Score</div>
+            <div class="game-score">Poeng: @gameState?.Score</div>
 
             @if (showNameInput && gameState?.GameOver == true)
             {
@@ -151,6 +152,14 @@
                 </div>
             }
         </div>
+
+        <div class="joystick-container" @ref="joystickContainer" 
+             @ontouchstart="OnJoystickStart" 
+             @ontouchmove="OnJoystickMove" 
+             @ontouchend="OnJoystickEnd">
+            <div class="joystick-base"></div>
+            <div class="joystick-stick" @ref="joystickStick"></div>
+        </div>
     </div>
 </div>
 
@@ -183,6 +192,13 @@
     private const int MinSwipeDistance = 50;
 
     private bool showCoffeeMessage;
+
+    private ElementReference joystickContainer;
+    private ElementReference joystickStick;
+    private bool isJoystickActive;
+    private double centerX;
+    private double centerY;
+    private const double DEAD_ZONE = 0.3;
 
     protected override async Task OnInitializedAsync()
     {
@@ -440,4 +456,79 @@
     }
 
     public void Dispose() => gameLoopCts?.Cancel();
+
+    private async Task OnJoystickStart(TouchEventArgs e)
+    {
+        isJoystickActive = true;
+        var rect = await JSRuntime.InvokeAsync<BoundingClientRect>("getBoundingClientRect", joystickContainer);
+        centerX = rect.Left + rect.Width / 2;
+        centerY = rect.Top + rect.Height / 2;
+        await UpdateJoystickPosition(e.Touches[0].ClientX, e.Touches[0].ClientY);
+    }
+
+    private async Task OnJoystickMove(TouchEventArgs e)
+    {
+        if (!isJoystickActive) return;
+        await UpdateJoystickPosition(e.Touches[0].ClientX, e.Touches[0].ClientY);
+    }
+
+    private async Task OnJoystickEnd(TouchEventArgs e)
+    {
+        isJoystickActive = false;
+        await JSRuntime.InvokeVoidAsync("setElementTransform", joystickStick, "translate(-50%, -50%)");
+    }
+
+    private async Task UpdateJoystickPosition(double touchX, double touchY)
+    {
+        var deltaX = touchX - centerX;
+        var deltaY = touchY - centerY;
+        var distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+        var maxRadius = 50; // Maximum distance the stick can move
+
+        if (distance > maxRadius)
+        {
+            deltaX = (deltaX / distance) * maxRadius;
+            deltaY = (deltaY / distance) * maxRadius;
+        }
+
+        await JSRuntime.InvokeVoidAsync("setElementTransform", joystickStick, 
+            $"translate(calc(-50% + {deltaX}px), calc(-50% + {deltaY}px))");
+
+        if (gameState == null || gameState.GameOver || countdown > 0 || showGo) return;
+
+        // Start game if waiting for input
+        if (waitingForKey)
+        {
+            waitingForKey = false;
+            countdown = 3;
+            _ = StartCountdown(gameLoopCts!.Token);
+            return;
+        }
+
+        // Determine direction based on joystick position
+        var normalizedX = deltaX / maxRadius;
+        var normalizedY = deltaY / maxRadius;
+
+        if (Math.Abs(normalizedX) < DEAD_ZONE && Math.Abs(normalizedY) < DEAD_ZONE)
+        {
+            return;
+        }
+
+        if (Math.Abs(normalizedX) > Math.Abs(normalizedY))
+        {
+            HandleMobileDirection(normalizedX > 0 ? Direction.Right : Direction.Left);
+        }
+        else
+        {
+            HandleMobileDirection(normalizedY > 0 ? Direction.Down : Direction.Up);
+        }
+    }
+
+    private class BoundingClientRect
+    {
+        public double Left { get; set; }
+        public double Top { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+    }
 }
