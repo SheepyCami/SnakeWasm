@@ -3,8 +3,8 @@
     "outputDirectory": "bin/Release/net8.0/publish/wwwroot",
     "installCommand": "echo 'Skipping npm install - this is a C# project'",
     "routes": [
-        { "handle": "filesystem" },
-        { "src": "/.*", "dest": "/index.html" }
+      { "handle": "filesystem" },
+      { "src": "/.*", "dest": "/index.html" }
     ]
-}
+  }
   
