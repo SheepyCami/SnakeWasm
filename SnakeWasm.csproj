@@ -8,16 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\assets\Body.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.14" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="wwwroot\assets\Body.png" />
   </ItemGroup>
 
   <ItemGroup>
