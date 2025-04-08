@@ -29,11 +29,13 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
-        window.addEventListener('load', async function () {
+        (async function () {
             try {
                 await Blazor.start();
+                console.log('Blazor started successfully');
+                
                 if ('serviceWorker' in navigator) {
                     try {
                         const registration = await navigator.serviceWorker.register('/service-worker.js');
@@ -44,8 +46,9 @@
                 }
             } catch (error) {
                 console.error('Blazor start failed:', error);
+                document.querySelector('.loading-progress-text').textContent = 'Error loading application: ' + error;
             }
-        });
+        })();
     </script>
 </body>
 

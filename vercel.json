@@ -4,9 +4,55 @@
   "cleanUrls": true,
   "routes": [
     {
-      "src": "/_framework/wasm/.*",
+      "handle": "filesystem"
+    },
+    {
+      "src": "/_framework/blazor.webassembly.js",
       "headers": {
-        "content-type": "application/wasm"
+        "content-type": "application/javascript",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/_framework/dotnet.([^.]+).js",
+      "headers": {
+        "content-type": "application/javascript",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/_framework/wasm/dotnet.wasm",
+      "headers": {
+        "content-type": "application/wasm",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/_framework/.*\\.dll",
+      "headers": {
+        "content-type": "application/octet-stream",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/_framework/blazor.boot.json",
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/service-worker.js",
+      "headers": {
+        "content-type": "application/javascript",
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/manifest.webmanifest",
+      "headers": {
+        "content-type": "application/manifest+json",
+        "cache-control": "no-cache"
       }
     },
     {
