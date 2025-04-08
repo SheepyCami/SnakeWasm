@@ -87,6 +87,24 @@
             <MobileControls OnDirectionChange="HandleMobileDirection" />
         </div>
 
+        <div class="mobile-controls-left">
+            <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Up)">
+                <span class="arrow">↑</span>
+            </button>
+            <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Down)">
+                <span class="arrow">↓</span>
+            </button>
+        </div>
+
+        <div class="mobile-controls-right">
+            <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Left)">
+                <span class="arrow">←</span>
+            </button>
+            <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Right)">
+                <span class="arrow">→</span>
+            </button>
+        </div>
+
         <div class="leaderboard-sidebar">
             <h2>🏆 Ledertavle</h2>
             @if (isNewHighScore)
