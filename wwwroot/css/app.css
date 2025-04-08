@@ -587,3 +587,91 @@ code {
         font-size: 0.8rem;
     }
 }
+
+/* Landscape mode for mobile devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .game-wrapper {
+        padding: 0.25rem;
+        min-height: unset;
+    }
+
+    .game-title {
+        display: none; /* Hide title in landscape to save space */
+    }
+
+    .game-content {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem;
+    }
+
+    .game-container {
+        width: auto;
+        height: 95vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .grid {
+        width: auto;
+        height: 95vh;
+        max-height: 95vh;
+    }
+
+    .mobile-controls-wrapper {
+        position: fixed;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 8px;
+        z-index: 100;
+    }
+
+    .control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .leaderboard-sidebar {
+        position: fixed;
+        left: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        padding: 0.5rem;
+        max-height: 90vh;
+        overflow-y: auto;
+        font-size: 0.9rem;
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    .leaderboard-sidebar h2 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .leaderboard li {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        margin: 0.1rem 0;
+    }
+
+    .score {
+        position: absolute;
+        top: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        padding: 0.25rem 0.5rem;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+}
