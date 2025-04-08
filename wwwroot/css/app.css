@@ -928,14 +928,12 @@ code {
     }
 }
 
-/* Portrait mode styles remain unchanged */
-/* ... existing code ... */
-
+/* Portrait mode styles */
 @media (max-width: 768px) and (orientation: portrait) {
     .joystick-container {
         display: block;
         position: fixed;
-        bottom: 20px;
+        bottom: max(20px, env(safe-area-inset-bottom));
         left: 50%;
         transform: translateX(-50%);
         width: 100px;
@@ -953,7 +951,7 @@ code {
     }
 }
 
-/* Mobile landscape specific */
+/* Landscape mode specific for phones */
 @media (max-width: 896px) and (orientation: landscape) {
     .leaderboard-sidebar {
         width: 160px;
@@ -972,5 +970,31 @@ code {
 
     .leaderboard .score {
         min-width: 25px;
+    }
+
+    .joystick-container {
+        display: block;
+        position: fixed;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        left: 20px;
+        transform: none;
+        width: 100px;
+        height: 100px;
+    }
+
+    .joystick-base {
+        width: 75px;
+        height: 75px;
+    }
+
+    .joystick-stick {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Hide mobile controls in landscape when joystick is active */
+    .mobile-controls-left,
+    .mobile-controls-right {
+        display: none;
     }
 }
