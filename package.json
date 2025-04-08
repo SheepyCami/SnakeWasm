@@ -1,0 +1,8 @@
+{
+  "name": "snake-wasm",
+  "version": "1.0.0",
+  "description": "Snake game built with Blazor WebAssembly",
+  "scripts": {
+    "build": "echo 'No build step needed for static files'"
+  }
+} 

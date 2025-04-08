@@ -6,7 +6,7 @@
       "dest": "/index.html"
     }
   ],
-  "buildCommand": "dotnet publish -c Release",
-  "outputDirectory": "bin/Release/net8.0/publish/wwwroot",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "wwwroot",
   "public": true
 } 
