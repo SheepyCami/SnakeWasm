@@ -1,6 +1,7 @@
 {
   "version": 2,
   "public": true,
+  "outputDirectory": "wwwroot",
   "headers": [
     {
       "source": "/_framework/(.*)",

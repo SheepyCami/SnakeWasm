@@ -32,30 +32,21 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
         window.addEventListener('load', function() {
-            var script = document.createElement('script');
-            script.src = '_framework/blazor.webassembly.js';
-            script.onload = function() {
-                Blazor.start().then(function() {
-                    console.log('Blazor started successfully');
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.register('/service-worker.js')
-                            .then(function(registration) {
-                                console.log('Service Worker registered with scope:', registration.scope);
-                            })
-                            .catch(function(error) {
-                                console.error('Service Worker registration failed:', error);
-                            });
-                    }
-                }).catch(function(error) {
-                    console.error('Blazor start failed:', error);
-                    document.querySelector('.loading-progress-text').textContent = 'Error loading application: ' + error;
-                });
-            };
-            script.onerror = function(error) {
-                console.error('Failed to load Blazor WebAssembly:', error);
-                document.querySelector('.loading-progress-text').textContent = 'Failed to load application resources';
-            };
-            document.body.appendChild(script);
+            Blazor.start().then(function() {
+                console.log('Blazor started successfully');
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(function(registration) {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(function(error) {
+                            console.error('Service Worker registration failed:', error);
+                        });
+                }
+            }).catch(function(error) {
+                console.error('Blazor start failed:', error);
+                document.querySelector('.loading-progress-text').textContent = 'Error loading application: ' + error;
+            });
         });
     </script>
 </body>
