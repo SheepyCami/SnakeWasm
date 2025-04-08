@@ -1,4 +1,12 @@
 {
-    "outputDirectory": "blazor-dist/wwwroot"
+    "version": 2,
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
+    ],
+    "buildCommand": "dotnet publish -c Release",
+    "outputDirectory": "bin/Release/net8.0/publish/wwwroot",
+    "public": true
 }
-  
