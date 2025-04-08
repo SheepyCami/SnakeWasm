@@ -6,6 +6,7 @@
             "dest": "/index.html"
         }
     ],
-    "outputDirectory": "wwwroot",
+    "outputDirectory": "blazor-dist/wwwroot",
     "public": true
 }
+  
