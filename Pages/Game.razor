@@ -83,10 +83,27 @@
             }
         </div>
 
+        <!-- Portrait mode controls -->
         <div class="mobile-controls-wrapper">
-            <MobileControls OnDirectionChange="HandleMobileDirection" />
+            <div class="control-row">
+                <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Up)">
+                    <span class="arrow">↑</span>
+                </button>
+            </div>
+            <div class="control-row">
+                <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Left)">
+                    <span class="arrow">←</span>
+                </button>
+                <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Down)">
+                    <span class="arrow">↓</span>
+                </button>
+                <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Right)">
+                    <span class="arrow">→</span>
+                </button>
+            </div>
         </div>
 
+        <!-- Landscape mode controls -->
         <div class="mobile-controls-left">
             <button class="control-btn" @onclick="() => HandleMobileDirection(Direction.Up)">
                 <span class="arrow">↑</span>
