@@ -437,6 +437,11 @@ code {
     bottom: 20px;
     flex-direction: column;
     gap: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
 }
 
 .mobile-controls-left {
@@ -451,23 +456,28 @@ code {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
+    border: 2px solid lime;
+    background-color: #000;
+    color: lime;
     font-size: 24px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .control-btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
 }
 
 .control-btn:active {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 255, 0, 0.2);
+    box-shadow: 0 0 12px rgba(0, 255, 0, 0.6);
+    transform: scale(0.95);
 }
 
 @media (max-width: 768px) {
@@ -626,59 +636,42 @@ code {
     }
 
     .game-content {
-        flex-direction: row;
-        justify-content: center;
+        flex-direction: column;
+        justify-content: flex-start;
         align-items: center;
         gap: 0.5rem;
         padding: 0.25rem;
+        height: auto;
     }
 
     .game-container {
         width: auto;
-        height: 95vh;
+        height: auto;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
     .grid {
-        width: auto;
-        height: 95vh;
-        max-height: 95vh;
-    }
-
-    .mobile-controls-wrapper {
-        display: none; /* Hide the default controls wrapper in landscape */
-    }
-
-    /* Show landscape-specific controls */
-    .mobile-controls-left,
-    .mobile-controls-right {
-        display: flex;
+        width: min(80vh, 600px);
+        height: auto;
+        aspect-ratio: 1;
+        margin: 0 auto;
     }
 
     .leaderboard-sidebar {
-        position: fixed;
-        left: 50%;
-        bottom: 0.5rem;
-        transform: translateX(-50%);
-        margin: 0;
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none;
+        margin: 0.5rem auto;
         padding: 0.5rem;
-        max-height: 20vh;
-        width: auto;
-        min-width: 200px;
+        max-height: 15vh;
+        width: min(80vh, 600px);
         overflow-y: auto;
         font-size: 0.9rem;
         background: rgba(0, 0, 0, 0.9);
         border-radius: 8px;
-        z-index: 1; /* Lower z-index so it doesn't overlap with controls */
-    }
-
-    .grid {
-        width: auto;
-        height: 90vh; /* Reduce height slightly to prevent overlap */
-        max-height: 90vh;
-        margin-bottom: 5vh; /* Add margin to prevent overlap with leaderboard */
     }
 
     /* Create left controls for up/down */
@@ -711,30 +704,6 @@ code {
         z-index: 100;
     }
 
-    .control-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-        outline: none;
-        box-shadow: none;
-    }
-
-    .control-btn:focus {
-        outline: none;
-        box-shadow: none;
-    }
-
-    .leaderboard-sidebar h2 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .leaderboard li {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-        margin: 0.1rem 0;
-    }
-
     .score {
         position: absolute;
         top: 0.5rem;
@@ -745,5 +714,6 @@ code {
         background: rgba(0, 0, 0, 0.7);
         border-radius: 4px;
         font-size: 1rem;
+        z-index: 2;
     }
 }
