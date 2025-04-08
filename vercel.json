@@ -1,5 +1,5 @@
 {
-    "buildCommand": "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 8.0.100 && dotnet publish -c Release",
+    "buildCommand": "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 8.0.100 && dotnet clean && dotnet publish -c Release",
     "outputDirectory": "bin/Release/net8.0/publish/wwwroot",
     "routes": [
         { "handle": "filesystem" },
