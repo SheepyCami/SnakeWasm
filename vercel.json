@@ -1,6 +1,7 @@
 {
     "buildCommand": "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 8.0.100 && rm -rf bin/Release && dotnet publish -c Release",
     "outputDirectory": "bin/Release/net8.0/publish/wwwroot",
+    "installCommand": "echo 'Skipping npm install - this is a C# project'",
     "routes": [
         { "handle": "filesystem" },
         { "src": "/.*", "dest": "/index.html" }
