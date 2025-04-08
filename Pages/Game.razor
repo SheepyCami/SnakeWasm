@@ -1,0 +1,388 @@
+﻿@page "/game"
+@implements IDisposable
+@using Snake.Game
+@using Microsoft.AspNetCore.Components.Web
+@using SnakeWasm.Game.Services
+@inject LeaderboardService Leaderboard
+
+<div class="game-wrapper">
+    <div class="game-title">
+        <h1>Velkommen til Slangespillet!</h1>
+        <p>Laget med C# og en god dose kaffe</p>
+    </div>
+    <div class="game-content">
+        <div class="game-container" tabindex="0" 
+             @onkeydown:preventDefault
+             @onkeydown="HandleKey"
+             @ontouchstart="HandleTouchStart"
+             @ontouchmove="HandleTouchMove"
+             @ontouchend="HandleTouchEnd"
+             @ref="gameBoard">
+            <div class="score">Poeng: @gameState?.Score</div>
+
+            @if (showNameInput && gameState?.GameOver == true)
+            {
+                <div class="overlay">
+                    <h2>Game Over!</h2>
+                    <p>Poeng: @gameState.Score</p>
+                    <div class="name-input">
+                        <input @bind="playerName" 
+                               @bind:event="oninput"
+                               @onclick:stopPropagation
+                               @onkeydown:stopPropagation
+                               placeholder="Skriv inn navnet ditt"
+                               @ref="nameInput" />
+                        <button @onclick="SubmitName">Send</button>
+                    </div>
+                    <div class="play-again-option">
+                        <p>eller</p>
+                        <button class="restart" @onclick="Restart">Spill igjen</button>
+                    </div>
+                </div>
+            }
+            else if (gameState?.GameOver == true && !showNameInput)
+            {
+                <div class="overlay">
+                    <button class="restart" @onclick="Restart">Spill igjen</button>
+                </div>
+            }
+            else if (waitingForKey)
+            {
+                <div class="countdown">@startMessage</div>
+            }
+            else if (countdown > 0)
+            {
+                <div class="countdown">Starter om: @countdown</div>
+            }
+            else if (showGo)
+            {
+                <div class="countdown go-text">GÅ!</div>
+            }
+            else if (showCoffeeMessage)
+            {
+                <div class="countdown coffee-text">Kaffegalskap!</div>
+            }
+
+            @if (gameState != null)
+            {
+                <div class="grid">
+                    @for (int r = 0; r < Rows; r++)
+                    {
+                        @for (int c = 0; c < Cols; c++)
+                        {
+                            var value = gameState.Grid[r, c];
+                            var isSnake = value == GridValue.Snake || (gameState.HeadPosition().Row == r && gameState.HeadPosition().Col == c);
+                            <div class="tile @(isSnake ? "snake" : "") @(isSnake && isBoosting ? "boosted" : "")">
+                                <img src="@GetTileImage(r, c)" class="tile-img" />
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="leaderboard-sidebar">
+            <h2>🏆 Ledertavle</h2>
+            @if (isNewHighScore)
+            {
+                <div class="new-high-score">🌟 NY REKORD! 🌟</div>
+            }
+            <ul class="leaderboard">
+                @foreach (var entry in topScores.Take(5))
+                {
+                    <li class="@(entry.Name == playerName && entry.Score == gameState?.Score ? "current-player" : "")">
+                        <span class="rank">#@(topScores.IndexOf(entry) + 1)</span>
+                        <span class="name">@entry.Name</span>
+                        <span class="score">@entry.Score</span>
+                    </li>
+                }
+            </ul>
+
+            @if (!IsPlayerInTop5 && playerRank > 0)
+            {
+                <div class="player-rank">
+                    <hr />
+                    <div class="rank-entry">
+                        <span class="rank">#@playerRank</span>
+                        <span class="name">@playerName</span>
+                        <span class="score">@gameState?.Score</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private const int Rows = 15;
+    private const int Cols = 15;
+    private const int NormalSpeed = 100;
+    private const int BoostedSpeed = 50;
+
+    private GameState gameState = null!;
+    private ElementReference gameBoard;
+    private ElementReference nameInput;
+    private CancellationTokenSource? gameLoopCts;
+
+    private bool waitingForKey = true;
+    private string startMessage = "TRYKK PÅ EN TAST FOR Å STARTE";
+    private int countdown = 0;
+    private bool showGo = false;
+    private bool isBoosting = false;
+
+    private string playerName = string.Empty;
+    private bool showNameInput = false;
+    private List<ScoreEntry> topScores = new();
+    private bool isNewHighScore = false;
+    private int playerRank = 0;
+    private bool IsPlayerInTop5 => gameState != null && topScores.Take(5).Any(x => x.Name == playerName && x.Score == gameState.Score);
+
+    private double touchStartX;
+    private double touchStartY;
+    private const int MinSwipeDistance = 50;
+
+    private bool showCoffeeMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        StartNewGame();
+        await Task.Delay(1);
+        await gameBoard.FocusAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && gameBoard.Context != null)
+        {
+            await gameBoard.FocusAsync();
+        }
+    }
+
+    private async Task SubmitName()
+    {
+        showNameInput = false;
+        await SubmitAndShowScores();
+    }
+
+    private void StartNewGame()
+    {
+        gameState = new GameState(Rows, Cols);
+        gameLoopCts?.Cancel();
+        gameLoopCts = new CancellationTokenSource();
+
+        countdown = 0;
+        showGo = false;
+        waitingForKey = true;
+        startMessage = "TRYKK PÅ EN TAST FOR Å STARTE";
+        isBoosting = false;
+        isNewHighScore = false;
+        showCoffeeMessage = false;
+    }
+
+    private async Task StartCountdown(CancellationToken token)
+    {
+        if (gameLoopCts == null) return;
+        
+        while (countdown > 0)
+        {
+            StateHasChanged();
+            await Task.Delay(1000, token);
+            countdown--;
+        }
+
+        showGo = true;
+        StateHasChanged();
+        await Task.Delay(1000);
+        showGo = false;
+
+        _ = RunGameLoop(gameLoopCts.Token);
+    }
+
+    private async Task RunGameLoop(CancellationToken token)
+    {
+        if (gameState == null || gameLoopCts == null) return;
+        
+        int currentDelay = NormalSpeed;
+
+        while (!gameState.GameOver && !token.IsCancellationRequested)
+        {
+            gameState.Move();
+
+            if (gameState.CoffeeEaten && !isBoosting)
+            {
+                isBoosting = true;
+                currentDelay = BoostedSpeed;
+                showCoffeeMessage = true;
+                StateHasChanged();
+
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(1000);
+                    showCoffeeMessage = false;
+                    StateHasChanged();
+                    
+                    await Task.Delay(4000);
+                    gameState.ResetCoffeeEaten();
+                    isBoosting = false;
+                    currentDelay = NormalSpeed;
+                });
+            }
+
+            StateHasChanged();
+            await Task.Delay(currentDelay, token);
+        }
+
+        if (string.IsNullOrWhiteSpace(playerName))
+        {
+            showNameInput = true;
+            StateHasChanged();
+            await Task.Delay(50); // Give time for the input to be rendered
+            await nameInput.FocusAsync();
+        }
+        else
+        {
+            await SubmitAndShowScores();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task SubmitAndShowScores()
+    {
+        if (gameState == null) return;
+        
+        if (!string.IsNullOrWhiteSpace(playerName))
+        {
+            await Leaderboard.SubmitScoreAsync(playerName, gameState.Score);
+
+            var best = await Leaderboard.GetPlayerBestScoreAsync(playerName);
+            if (best == gameState.Score)
+                isNewHighScore = true;
+
+            // Get rank
+            var rank = await Leaderboard.GetPlayerRankAsync(playerName, gameState.Score);
+            playerRank = rank ?? 0;
+        }
+
+        // Fetch top 5 scores
+        topScores = await Leaderboard.GetTopScoresAsync();
+    }
+
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (gameState == null || gameLoopCts == null) return;
+
+        if (waitingForKey)
+        {
+            waitingForKey = false;
+            countdown = 3;
+            _ = StartCountdown(gameLoopCts.Token);
+            return;
+        }
+
+        if (gameState.GameOver || countdown > 0 || showGo) return;
+
+        switch (e.Key.ToLower())
+        {
+            case "arrowup": gameState.ChangeDirection(Direction.Up); break;
+            case "arrowdown": gameState.ChangeDirection(Direction.Down); break;
+            case "arrowleft": gameState.ChangeDirection(Direction.Left); break;
+            case "arrowright": gameState.ChangeDirection(Direction.Right); break;
+        }
+    }
+
+    private void HandleTouchStart(TouchEventArgs e)
+    {
+        if (gameLoopCts == null) return;
+
+        if (e.Touches.Length > 0)
+        {
+            touchStartX = e.Touches[0].ClientX;
+            touchStartY = e.Touches[0].ClientY;
+        }
+
+        if (waitingForKey)
+        {
+            waitingForKey = false;
+            countdown = 3;
+            _ = StartCountdown(gameLoopCts.Token);
+        }
+    }
+
+    private void HandleTouchMove(TouchEventArgs e)
+    {
+        if (gameState == null) return;
+        if (gameState.GameOver || countdown > 0 || showGo) return;
+        
+        if (e.Touches.Length > 0)
+        {
+            var touch = e.Touches[0];
+            var deltaX = touch.ClientX - touchStartX;
+            var deltaY = touch.ClientY - touchStartY;
+
+            if (Math.Abs(deltaX) < MinSwipeDistance && Math.Abs(deltaY) < MinSwipeDistance)
+                return;
+
+            if (Math.Abs(deltaX) > Math.Abs(deltaY))
+            {
+                // Horizontal swipe
+                if (deltaX > 0)
+                    gameState.ChangeDirection(Direction.Right);
+                else
+                    gameState.ChangeDirection(Direction.Left);
+            }
+            else
+            {
+                // Vertical swipe
+                if (deltaY > 0)
+                    gameState.ChangeDirection(Direction.Down);
+                else
+                    gameState.ChangeDirection(Direction.Up);
+            }
+
+            // Update start position for next move
+            touchStartX = touch.ClientX;
+            touchStartY = touch.ClientY;
+        }
+    }
+
+    private void HandleTouchEnd(TouchEventArgs e)
+    {
+        // Reset touch positions
+        touchStartX = 0;
+        touchStartY = 0;
+    }
+
+    private string GetTileImage(int row, int col)
+    {
+        var value = gameState.Grid[row, col];
+        bool isHead = gameState.HeadPosition().Row == row && gameState.HeadPosition().Col == col;
+
+        if (gameState.GameOver)
+        {
+            if (isHead) return "/assets/DeadHead.png";
+            if (value == GridValue.Snake) return "/assets/DeadBody.png";
+        }
+        else if (isHead)
+        {
+            return "/assets/Head.png";
+        }
+
+        return value switch
+        {
+            GridValue.Snake => "/assets/Body.png",
+            GridValue.Food => "/assets/Food.png",
+            GridValue.Coffee => "/assets/Coffee.png",
+            _ => "/assets/Empty.png"
+        };
+    }
+
+    private async void Restart()
+    {
+        StartNewGame();
+        await Task.Delay(50);
+        await gameBoard.FocusAsync();
+    }
+
+    public void Dispose() => gameLoopCts?.Cancel();
+}
